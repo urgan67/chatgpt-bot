@@ -1,8 +1,15 @@
+
 import sqlite3
 conn = sqlite3.connect('./db/db.litesql')
 
-
-
+# data = {
+#     "user_id": 21258098,
+#     "name": 'Ann',
+#     "cash": 10,
+# }
+# user_id = data.get('user_id')
+# name = data.get('name')
+# cash = data.get('cash')
 
 #### USERS: ####
 
@@ -31,7 +38,7 @@ def add_data_user(user_id, name, cash):
                 INSERT INTO users (user_id, name, cash)
                 VALUES (?, ?, ?)
             ''',
-            (user_id, name, cash)
+            (user_id = data.get('user_id'), name = data.get('name'), cash = data.get('cash'))
         )
         conn.commit()
         cursor.close()

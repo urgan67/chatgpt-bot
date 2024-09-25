@@ -11,10 +11,13 @@ from worker import add_data_user, get_data_user
 
 data = {
     "user_id": 21258098,
-    # "name": name,
-    # "cash": cash,
+    "name": 'Ann',
+    "cash": 10,
 }
-
+user_id = data.get('user_id')
+name = data.get('name')
+cash = data.get('cash')
+print(user_id, name, cash)
 
 # Запуск функции:
 # confirm = add_data_user(data)
