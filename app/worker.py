@@ -2,11 +2,11 @@
 import sqlite3
 conn = sqlite3.connect('./db/db.litesql')
 
-# data = {
-#     "user_id": 21258098,
-#     "name": 'Ann',
-#     "cash": 10,
-# }
+data = {
+    "user_id": 212580,
+    "name": 'Ann',
+    "cash": 10,
+}
 # user_id = data.get('user_id')
 # name = data.get('name')
 # cash = data.get('cash')
@@ -14,14 +14,14 @@ conn = sqlite3.connect('./db/db.litesql')
 #### USERS: ####
 
 # Чтение USERS:
-def get_data_user(user_id):
+def get_data_user(data):
 
     try:
         cursor = conn.cursor()
         cursor.execute('''
                 SELECT * FROM users WHERE user_id = ?;
             ''',
-            (user_id,)
+            (data['user_id'],) 
         )
         user = cursor.fetchone()
         cursor.close()
@@ -30,7 +30,7 @@ def get_data_user(user_id):
         return f"Error get data user {e}"
 
 # Добавление в USERS:
-def add_data_user(user_id, name, cash):
+def add_data_user(data):
 
     try:
         cursor = conn.cursor()
@@ -38,7 +38,7 @@ def add_data_user(user_id, name, cash):
                 INSERT INTO users (user_id, name, cash)
                 VALUES (?, ?, ?)
             ''',
-            (user_id = data.get('user_id'), name = data.get('name'), cash = data.get('cash'))
+            (data.get('user_id'), data.get('name'), data.get('cash'))
         )
         conn.commit()
         cursor.close()

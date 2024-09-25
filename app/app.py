@@ -10,7 +10,7 @@ from worker import add_data_user, get_data_user
 # cash = 0.0
 
 data = {
-    "user_id": 21258098,
+    "user_id": 212580111,
     "name": 'Ann',
     "cash": 10,
 }
@@ -20,12 +20,13 @@ cash = data.get('cash')
 print(user_id, name, cash)
 
 # Запуск функции:
-# confirm = add_data_user(data)
-# confirm = add_data_user(user_id, name, cash)
-# if confirm is True:
-#     print("Пользователь {user_id} {name} внесен в таблицу users.")
-# else:
-#     print("Ошибка записи данных в таблицу Users.")
+confirm = add_data_user(data)
+confirm = get_data_user(21258098)
+confirm = get_data_user(212580)
+if confirm is True:
+    print("Пользователь {user_id} {name} внесен в таблицу users.")
+else:
+    print("Ошибка записи данных в таблицу Users.")
 
 
 
