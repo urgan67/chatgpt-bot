@@ -5,14 +5,14 @@ conn = sqlite3.connect('./db/db.litesql')
 #### USERS:
 
 # Чтение USERS:
-def get_data_user(data):
+def get_data_user(user_id):
 
     try:
         cursor = conn.cursor()
         cursor.execute('''
                 SELECT * FROM users WHERE user_id = ?;
             ''',
-            (data['user_id'],) 
+            (user_id,) 
         )
         user = cursor.fetchone()
         cursor.close()
@@ -43,9 +43,9 @@ def update_data_user(data):
     try:
         cursor = conn.cursor()
         cursor.execute('''
-                UPDATE user SET user_id = ?;
-            ''',
-            (data.get('user_id'), data.get('name'), data.get('cash'))
+            UPDATE user SET user_id = ?, name = ?, cash = ? WHERE user_id = ?;
+        ''', 
+        (data.get('user_id'), data.get('name'), data.get('cash'), data.get('user_id'))
         )
         conn.commit()
         cursor.close()
@@ -59,25 +59,17 @@ def update_data_user(data):
 
 # Add session:
 
-def add_session(conn, data, user_id):
-    cursor = conn.cursor()
+def add_session(data):
     try:
-        cursor.execute('SELECT * FROM users WHERE user_id = ?;', (user_id,))
-        user = cursor.fetchone()
-        if user is None:
-            print(f"Пользователь с user_id {data} не найден.")
-            return False
-
+        cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO session (user_id, model, tokens, price)
-            VALUES (?, ?, ?, ?);
-        ''', (data.get('user_id'))
+            INSERT INTO session (user_id, tokens, price)
+            VALUES (?, ?, ?);
+        ''', (data.get('user_id',data.get('tokens'),data.get('price')))
         )
         conn.commit()
-        print(f"Сессия для пользователя с user_id {data} успешно добавлена.")
         return True
-    except sqlite3.Error as e:
-        print(f"Ошибка при добавлении сессии для пользователя с user_id {data}: {e}")
+    except Exception as e:
         return False
     
 # Read sessions:

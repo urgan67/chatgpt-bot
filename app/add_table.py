@@ -8,13 +8,9 @@ cursor = conn.cursor()
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username VARCHAR(50),
-    name VARCHAR(50), 
-    first_name VARCHAR(50),
-    last_name VARCHAR(50),
+    name VARCHAR(50),
     cash FLOAT,
-    date TIMESTAMP,
-    last_active TIMESTAMP
+    date TIMESTAMP
 );
 ''')
 
@@ -22,12 +18,10 @@ CREATE TABLE IF NOT EXISTS users (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS session (
     session_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INT REFERENCES users(user_id) ON DELETE CASCADE,
-    model VARCHAR(50),
+    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
     tokens INTEGER,
     price FLOAT,
-    date TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (user_id)
+    date TIMESTAMP
 );
 ''')
 
