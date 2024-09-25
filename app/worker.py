@@ -47,7 +47,19 @@ def add_data_user(data):
         return False
 
 # Update Users:
+def update_data_user(data):
 
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+                UPDATE user SET user_id = ?;
+            ''',
+            (data.get('user_id'), data.get('name'), data.get('cash'))
+        )
+        cursor.close()
+        return f"{cursor.rowcount} record(s) updated."
+    except Exception as e:
+        return f"Error updating user data: {e}"
 
 
 
