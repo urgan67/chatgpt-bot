@@ -38,20 +38,44 @@ def add_data_user(data):
         return False
 
 # Update Users:
-def update_data_user(data):
+def update_data_user(user_id_to_update):
 
     try:
         cursor = conn.cursor()
+# Определите переменные для user_id и новой суммы cash
+        user_id_to_update = 1258098  # замените на нужный user_id
+        new_cash_value = 100.0  # замените на нужное значение cash
+
+# Обновление cash для конкретного user_id
         cursor.execute('''
-            UPDATE user SET user_id = ?, name = ?, cash = ? WHERE user_id = ?;
-        ''', 
-        (data.get('user_id'), data.get('name'), data.get('cash'), data.get('user_id'))
-        )
+        UPDATE users
+        SET cash = ?
+        WHERE user_id = ?
+        ''', (new_cash_value, user_id_to_update))
+
+# Не забудьте зафиксировать изменения в базе данных
         conn.commit()
         cursor.close()
-        return f"{cursor.rowcount} record(s) updated."
-    except Exception as e:
-        return f"Error updating user data: {e}"
+        return True
+    except:
+        return False
+    #     return f"{cursor.rowcount} record(s) updated."
+    # except Exception as e:
+    #     return f"Error updating user data: {e}"
+# def update_data_user(data):
+
+#     try:
+#         cursor = conn.cursor()
+#         cursor.execute('''
+#                 UPDATE user SET user_id = ?;
+#             ''',
+#             (data.get('user_id'), data.get('name'), data.get('cash'))
+#         )
+#         conn.commit()
+#         cursor.close()
+#         return f"{cursor.rowcount} record(s) updated."
+#     except Exception as e:
+#         return f"Error updating user data: {e}"
 
 
 
@@ -63,13 +87,15 @@ def add_session(data):
     try:
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO session (user_id, tokens, price)
-            VALUES (?, ?, ?);
-        ''', (data.get('user_id',data.get('tokens'),data.get('price')))
+            INSERT INTO session (user_id, model, tokens, price)
+            VALUES (?, ?, ?, ?);
+        ''', (data.get('user_id'))
         )
         conn.commit()
+        print(f"Сессия для пользователя с user_id {data} успешно добавлена.")
         return True
-    except Exception as e:
+    except sqlite3.Error as e:
+        print(f"Ошибка при добавлении сессии для пользователя с user_id {data}: {e}")
         return False
     
 # Read sessions:
