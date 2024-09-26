@@ -37,18 +37,49 @@ def add_data_user(data):
     except:
         return False
 
+
+
+
+
+
+# data = {
+#     "name": "JakQ",
+#     "cash": 1.0,
+#     "user_id": 1,
+# }
+
 # Update Users:
-def update_data_user(user_id_to_update, new_cash_value):
+def update_data_user(data):
+
+    user_id = data.get("user_id")
+
+    if not user_id:
+        return False 
+
+    key_dict, value_dic = [], []
+
+    for key, value in data.items():
+        if key != "user_id":
+            key_dict.append(f"{key} = ?")
+        value_dic.append(value)
+
+    
+    key_dict = ", ".join(key_dict)
+    #value_dic = ", ".join(map(str, value_dic))
+
+    # print(key_dict)
+    # print()
+    # print(value_dic)
+
     try:
         cursor = conn.cursor()
-        # Обновление cash для конкретного user_id
-        cursor.execute('''
-        UPDATE users
-        SET cash = ?
-        WHERE user_id = ?
-        ''', (new_cash_value, user_id_to_update))
+        cursor.execute(
+            f'''
+                UPDATE users SET {key_dict} WHERE user_id = ?
+            ''',
+                (value_dic)
+        )
 
-        # Фиксация изменений
         conn.commit()
         return True
     except Exception as e:
@@ -57,18 +88,24 @@ def update_data_user(user_id_to_update, new_cash_value):
     finally:
         cursor.close()
 
+
+
+
+
+
 # Пример вызова функции
-user_id_to_update = 1  # Замените на нужный user_id
-new_cash_value = 100.0  # Замените на нужное значение cash
-result = update_data_user(user_id_to_update, new_cash_value)
+data = {
+    "name": "Jak",
+    "cash": 5.0,
+    "date": 1.0,
+    "user_id": 1,
+}
 
-if result:
-    print("Данные успешно обновлены.")
-else:
-    print("Произошла ошибка при обновлении данных.")
+result = update_data_user(data)
+print(result)
 
-
-
+data_user_1 = get_data_user(1)
+print(data_user_1)
 
 
 # def update_data_user(data):
