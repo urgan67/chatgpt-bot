@@ -4,6 +4,10 @@ import sqlite3
 conn = sqlite3.connect('./db/db.litesql')
 cursor = conn.cursor()
 
+# Удаляем таблицы (если уже существуют) для избежания конфликтов
+cursor.execute('DROP TABLE IF EXISTS session;')
+cursor.execute('DROP TABLE IF EXISTS users;')
+
 # Создание таблицы users
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS users (
@@ -14,18 +18,19 @@ CREATE TABLE IF NOT EXISTS users (
 );
 ''')
 
-# Создание таблицы session
+# Создание таблицы session с измененным именем столбца
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS session (
     session_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
-    tokens INTEGER,
+    user_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    num_tokens INTEGER,  -- изменено с tokens на num_tokens
     price FLOAT,
     date TIMESTAMP
 );
 ''')
 
-# Зафиксировать изменения и закрыть соединение
+# Сохраняем изменения и закрываем соединение
 conn.commit()
 conn.close()
 

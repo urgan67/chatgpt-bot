@@ -1,5 +1,4 @@
-from worker import add_data_user, get_data_user,update_data_user,add_session
-
+from worker import add_data_user, get_data_user,update_data_user
 
 
 
@@ -11,7 +10,7 @@ from worker import add_data_user, get_data_user,update_data_user,add_session
 
 data = {
     "user_id": 21258,
-    "name": 'Tom',
+    "name": 'Tommy',
     "cash": 1500,
     "session_id": 1,
     "tokens": 10,

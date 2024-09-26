@@ -38,30 +38,39 @@ def add_data_user(data):
         return False
 
 # Update Users:
-def update_data_user(user_id_to_update):
-
+def update_data_user(user_id_to_update, new_cash_value):
     try:
         cursor = conn.cursor()
-# Определите переменные для user_id и новой суммы cash
-        user_id_to_update = 1258098  # замените на нужный user_id
-        new_cash_value = 100.0  # замените на нужное значение cash
-
-# Обновление cash для конкретного user_id
+        # Обновление cash для конкретного user_id
         cursor.execute('''
         UPDATE users
         SET cash = ?
         WHERE user_id = ?
         ''', (new_cash_value, user_id_to_update))
 
-# Не забудьте зафиксировать изменения в базе данных
+        # Фиксация изменений
         conn.commit()
-        cursor.close()
         return True
-    except:
+    except Exception as e:
+        print(f"An error occurred: {e}")
         return False
-    #     return f"{cursor.rowcount} record(s) updated."
-    # except Exception as e:
-    #     return f"Error updating user data: {e}"
+    finally:
+        cursor.close()
+
+# Пример вызова функции
+user_id_to_update = 1  # Замените на нужный user_id
+new_cash_value = 100.0  # Замените на нужное значение cash
+result = update_data_user(user_id_to_update, new_cash_value)
+
+if result:
+    print("Данные успешно обновлены.")
+else:
+    print("Произошла ошибка при обновлении данных.")
+
+
+
+
+
 # def update_data_user(data):
 
 #     try:
@@ -83,20 +92,20 @@ def update_data_user(user_id_to_update):
 
 # Add session:
 
-def add_session(data):
-    try:
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO session (user_id, model, tokens, price)
-            VALUES (?, ?, ?, ?);
-        ''', (data.get('user_id'))
-        )
-        conn.commit()
-        print(f"Сессия для пользователя с user_id {data} успешно добавлена.")
-        return True
-    except sqlite3.Error as e:
-        print(f"Ошибка при добавлении сессии для пользователя с user_id {data}: {e}")
-        return False
+# def add_session(data):
+#     try:
+#         cursor = conn.cursor()
+#         cursor.execute('''
+#             INSERT INTO session (user_id, model, tokens, price)
+#             VALUES (?, ?, ?, ?);
+#         ''', (data.get('user_id'))
+#         )
+#         conn.commit()
+#         print(f"Сессия для пользователя с user_id {data} успешно добавлена.")
+#         return True
+#     except sqlite3.Error as e:
+#         print(f"Ошибка при добавлении сессии для пользователя с user_id {data}: {e}")
+#         return False
     
 # Read sessions:
 
