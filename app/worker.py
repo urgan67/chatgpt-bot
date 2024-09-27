@@ -23,36 +23,39 @@ def get_data_user(user_id):
 # Add USERS:
 def add_data_user(data):
     try:
-        key_dict = []  # список для ключей (названий столбцов)
-        value_dict = []  # список для значений
+        key_dict = []
+        value_dict = [] 
 
-        # Формируем список столбцов и значений, исключая 'user_id'
         for key, value in data.items():
             if key != "user_id":
                 key_dict.append(key)
                 value_dict.append(value)
-        
-        # Добавляем 'user_id' отдельно
+
         user_id = data.get('user_id')
 
-        # Делаем строку с названиями полей и placeholders
-        columns = ', '.join(key_dict)
-        placeholders = ', '.join(['?'] * len(value_dict))
+       
+        key_dict = ', '.join(key_dict)
+        value_dict = ', '.join(['?'] * len(value_dict))
 
-        # Формируем SQL-запрос
-        query = f"INSERT INTO users (user_id, {columns}) VALUES (?, {placeholders})"
-
-        # Выполняем запрос с подстановкой значений
+        cursor.execute(
+            f'''
+                INSERT INTO users (user_id, {key_dict}) VALUES (?, {value_dict})
+            ''',
+                (value_dict)
+        )
         cursor = conn.cursor()
-        cursor.execute(query, (user_id, *value_dict))
-        
+        value_dict.append(user_id)
+
+        cursor.execute(
+            (user_id, *value_dict)
+        )
+
         conn.commit()
         cursor.close()
         return True
     except Exception as e:
         print(f"Ошибка: {e}")
         return False
-
 
 
 # Update USERS:
@@ -68,13 +71,19 @@ def update_data_user(data):
     for key, value in data.items():
         if key != "user_id":
             key_dict.append(f"{key} = ?")
-        value_dic.append(value)
+            value_dic.append(value)
 
     
     key_dict = ", ".join(key_dict)
+    #value_dic = ", ".join(map(str, value_dic))
+
+    print(key_dict)
+    # print()
+    print(value_dic)
 
     try:
         cursor = conn.cursor()
+        value_dic.append(user_id)
         cursor.execute(
             f'''
                 UPDATE users SET {key_dict} WHERE user_id = ?
@@ -89,9 +98,3 @@ def update_data_user(data):
         return False
     finally:
         cursor.close()
-
-
-
-
-
-
