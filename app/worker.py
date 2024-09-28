@@ -21,35 +21,33 @@ def get_data_user(user_id):
         return f"Error get data user {e}"
 
 # Add USERS:
+
 def add_data_user(data):
+
+    # Инициализируем списки для ключей и значений
+    key_dict, value_dict = [],[]
+
+    # Формирование списков ключей и значений
+    for key, value in data.items():
+        if key != "user_id": 
+            key_dict.append(key)
+            value_dict.append(value)
+
+    # Преобразуем список ключей в строку, разделенную запятыми
+    key_dict = ", ".join(key_dict)
+
+    # Подготавливаем строки для плейсхолдеров значений
+    value_dict = ", ".join(['?'] * len(value_dict))
+
     try:
-        key_dict = []
-        value_dict = [] 
-
-        for key, value in data.items():
-            if key != "user_id":
-                key_dict.append(key)
-                value_dict.append(value)
-
-        user_id = data.get('user_id')
-
-       
-        key_dict = ', '.join(key_dict)
-        value_dict = ', '.join(['?'] * len(value_dict))
-
+        cursor = conn.cursor()
         cursor.execute(
             f'''
-                INSERT INTO users (user_id, {key_dict}) VALUES (?, {value_dict})
-            ''',
-                (value_dict)
+            INSERT INTO users ({key_dict}) 
+            VALUES ({value_dict})
+            ''', value_dict
         )
-        cursor = conn.cursor()
-        value_dict.append(user_id)
-
-        cursor.execute(
-            (user_id, *value_dict)
-        )
-
+        
         conn.commit()
         cursor.close()
         return True
@@ -75,8 +73,8 @@ def update_data_user(data):
 
     
     key_dict = ", ".join(key_dict)
-    #value_dic = ", ".join(map(str, value_dic))
-
+  
+    value_dict = ", ".join(['?'] * len(value_dict))
     print(key_dict)
     # print()
     print(value_dic)
@@ -90,7 +88,7 @@ def update_data_user(data):
             ''',
                 (value_dic)
         )
-
+        
         conn.commit()
         return True
     except Exception as e:
