@@ -4,7 +4,7 @@ conn = sqlite3.connect('./db/db.litesql')
 
 #### USERS:
 
-# Get USERS:
+# Чтение данных USERS:
 def get_data_user(user_id):
 
     try:
@@ -20,7 +20,7 @@ def get_data_user(user_id):
     except Exception as e:
         return f"Error get data user {e}"
 
-# Add USERS:
+# Добавление USERS:
 
 def add_data_user(data):
 
@@ -38,7 +38,7 @@ def add_data_user(data):
 
     # Подготавливаем строки для плейсхолдеров значений
     value_dict = ", ".join(['?'] * len(value_dict))
-
+# 
     try:
         cursor = conn.cursor()
         cursor.execute(
@@ -47,7 +47,7 @@ def add_data_user(data):
             VALUES ({value_dict})
             ''', value_dict
         )
-        
+
         conn.commit()
         cursor.close()
         return True
@@ -56,7 +56,7 @@ def add_data_user(data):
         return False
 
 
-# Update USERS:
+# Обновление данных USERS:
 def update_data_user(data):
 
     user_id = data.get("user_id")
