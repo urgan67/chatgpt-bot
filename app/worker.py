@@ -28,12 +28,26 @@ def get_data_user(user_id):
             (user_id,) 
         )
 
-        user = cursor.fetchone()
+        data_user = cursor.fetchone()
+
+        data = {}
+
+        for key, value in zip(cursor.description, data_user):
+            data[key[0]] = value
+
         cursor.close()
-        return user
+        return data
     
     except Exception as e:
         return f"Error get data user {e}"
+
+
+data = get_data_user(4)
+# print(data)
+print("user_id:", data.get("user_id"))
+print("cash:", data.get("cash"))
+print("name:", data.get("name"))
+
 
 
 
@@ -189,10 +203,53 @@ def get_data_session(user_id):
             (user_id,) 
         )
 
-        user = cursor.fetchone()
+        all_sesion_user = cursor.fetchall()
         cursor.close()
-        return user
+
+
+        # # print(*user)
+
+        # # for n in user:
+        # #     ff = *(n)
+
+        # data = []
+
+        # for record in all_sesion_user:
+        #     data.append(record)
+
+
+
+
+        
+        print(data)
+        return all_sesion_user
     
     except Exception as e:
         return f"Error get data user {e}"
+    
 
+
+
+# data = {
+#     "user_id": 4,
+#     #"name": 'Hui',
+#     #"cash": 150400,
+#     #"session_id": 1,
+#     "tokens": 1566600,
+#     "price": 6,  
+# }
+
+
+# jopa = add_data_session(data)
+# print(jopa)
+
+
+# data = get_data_session(4)
+# # print(data)
+
+# # for n in data:
+# #     print(n)
+
+
+# user = get_data_user(4)
+# print(user.get("user_id"))
