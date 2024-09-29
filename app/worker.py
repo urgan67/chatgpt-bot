@@ -23,43 +23,39 @@ def get_data_user(user_id):
 # Добавление USERS:
 
 def add_data_user(data):
-    
     try:
-
         user_id = data.get("user_id")
 
         if not user_id:
-            return False 
-    
-        keys = []
-        values = []
-        drop = []
+            return False
 
+        keys, values, drop = [], [], []
+    
         for key, value in data.items():
-            if key != "user_id": 
+            if key != "user_id":  # Исключаем user_id из списка значений
                 keys.append(key)
             values.append(value)
             drop.append("?")
-            
-    # Преобразуем списки ключей и плейсхолдеров в строки, разделенные запятыми
-        key_str = ", ".join(keys)
-        drops = ", ".join(drop)
-  
+
+        keys = ", ".join(keys)
+        drop = ", ".join(drop)
+
         cursor = conn.cursor()
         cursor.execute(
             f'''
-            INSERT INTO users ({key_str}) VALUES ({drops})
+            INSERT INTO users ({keys}, user_id) VALUES ({drop}, ?) 
             ''', 
-            values
-        )
+            values 
+        )  # Передаем только values в execute()
         conn.commit()
         cursor.close()
-        print(key_str)
-        print(values)
         return True
+
     except Exception as e:
         print(f"Ошибка: {e}")
-        return False
+        return False 
+
+
 
 
 

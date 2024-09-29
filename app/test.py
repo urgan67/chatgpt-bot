@@ -2,7 +2,7 @@ from worker import get_data_user,update_data_user,add_data_user
 
 
 data = {
-    # "user_id": 17,
+    "user_id": 17,
     "name": 'х',
     "cash": 100,  
 }
