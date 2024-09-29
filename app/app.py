@@ -1,4 +1,4 @@
-from worker import add_data_user, get_data_user,update_data_user
+from worker import add_data_user, get_data_user,update_data_user,add_data_session
 
 
 
@@ -12,10 +12,9 @@ data = {
     "user_id": 21258,
     "name": 'Tommy',
     "cash": 1500,
-    "session_id": 1,
     "tokens": 10,
-    "price": 2,
-    
+    "price": 1,
+    "session_id": 1
 }
 user_id = data.get('user_id')
 name = data.get('name')
@@ -23,6 +22,12 @@ cash = data.get('cash')
 session_id = data.get('session_id')
 tokens = data.get('tokens')
 price = data.get('price')
+
+
+add_data_session(data)
+print(data)
+
+        
 
 # print(user_id, name, cash)
 

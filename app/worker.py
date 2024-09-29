@@ -18,7 +18,7 @@ conn = sqlite3.connect('./db/db.litesql')
 #### USERS:
 
 
-# Чтение данных USERS:
+# Получение данных USERS:
 def get_data_user(user_id):
     try:
         cursor = conn.cursor()
@@ -136,3 +136,63 @@ def update_data_user(data):
 
 # # data_2 = get_data_user(8)
 # # print(data_2)
+
+
+
+
+
+#### Sessions:
+
+# Добавление Session:
+def add_data_session(data_session):
+    try:
+        user_id = data_session.get("user_id")
+
+        if not user_id:
+            return False
+
+        keys, values, drop = [], [], []
+    
+        for key, value in data_session.items():
+            keys.append(key)
+            values.append(value)
+            drop.append("?")
+
+        keys = ", ".join(keys)
+        drop = ", ".join(drop)
+
+        cursor = conn.cursor()
+        cursor.execute(
+            f'''
+            INSERT INTO session ({keys}) VALUES ({drop}) 
+            ''', 
+            (*values,) 
+        )  # Передаем только values в execute()
+
+        conn.commit()
+        cursor.close()
+        return True
+
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return False 
+
+
+
+# Чтение данных Session:
+def get_data_session(user_id):
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+                SELECT * FROM session WHERE user_id = ?;
+            ''',
+            (user_id,) 
+        )
+
+        user = cursor.fetchone()
+        cursor.close()
+        return user
+    
+    except Exception as e:
+        return f"Error get data user {e}"
+
