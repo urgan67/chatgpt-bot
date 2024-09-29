@@ -2,11 +2,24 @@
 import sqlite3
 conn = sqlite3.connect('./db/db.litesql')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 #### USERS:
+
 
 # Чтение данных USERS:
 def get_data_user(user_id):
-
     try:
         cursor = conn.cursor()
         cursor.execute('''
@@ -14,14 +27,17 @@ def get_data_user(user_id):
             ''',
             (user_id,) 
         )
+
         user = cursor.fetchone()
         cursor.close()
         return user
+    
     except Exception as e:
         return f"Error get data user {e}"
 
-# Добавление USERS:
 
+
+# Добавление USERS:
 def add_data_user(data):
     try:
         user_id = data.get("user_id")
@@ -32,8 +48,7 @@ def add_data_user(data):
         keys, values, drop = [], [], []
     
         for key, value in data.items():
-            if key != "user_id":  # Исключаем user_id из списка значений
-                keys.append(key)
+            keys.append(key)
             values.append(value)
             drop.append("?")
 
@@ -43,10 +58,11 @@ def add_data_user(data):
         cursor = conn.cursor()
         cursor.execute(
             f'''
-            INSERT INTO users ({keys}, user_id) VALUES ({drop}, ?) 
+            INSERT INTO users ({keys}) VALUES ({drop}) 
             ''', 
-            values 
+            (*values,) 
         )  # Передаем только values в execute()
+
         conn.commit()
         cursor.close()
         return True
@@ -56,47 +72,67 @@ def add_data_user(data):
         return False 
 
 
+# data = {
+#     #"name": 'Anny',
+#     "user_id": 10,
+#     #"cash": 15000,
+# }
 
+# data = add_data_user(data)
+# print(data)
 
+# data_2 = get_data_user(10)
+# print(data_2)
 
 
 # Обновление данных USERS:
 def update_data_user(data):
-
-    user_id = data.get("user_id")
-
-    if not user_id:
-        return False 
-
-    key_dict, value_dic = [], []
-
-    for key, value in data.items():
-        if key != "user_id":
-            key_dict.append(f"{key} = ?")
-        value_dic.append(value)
-
-    
-    key_dict = ", ".join(key_dict)
-  
-    # value_dict = ", ".join(['?'] * len(value_dict))
-    # print(key_dict)
-    # # print()
-    # print(value_dic)
-
     try:
-        cursor = conn.cursor()
+        user_id = data.get("user_id")
+
+        if not user_id:
+            return False
+
+        key_dict, value_dic = [], []
+
+        for key, value in data.items():
+            if key != "user_id":
+                key_dict.append(f"{key} = ?")
+                value_dic.append(value)
+
+        if not key_dict:
+            return False
+
+        key_dict = ", ".join(key_dict)
         value_dic.append(user_id)
+
+        cursor = conn.cursor()
         cursor.execute(
             f'''
                 UPDATE users SET {key_dict} WHERE user_id = ?
             ''',
-                (value_dic)
+                (*value_dic,)
         )
-        
+
         conn.commit()
+        cursor.close()
         return True
+    
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
-    finally:
-        cursor.close()
+
+
+
+
+# data = {
+#     #"name": 'Jopa',
+#     "user_id": 8,
+#     #"cash": 3,
+# }
+
+# data = update_data_user(data)
+# print(data)
+
+# # data_2 = get_data_user(8)
+# # print(data_2)
