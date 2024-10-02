@@ -4,17 +4,6 @@ conn = sqlite3.connect('./db/db.litesql')
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 #### USERS:
 
 
@@ -44,9 +33,9 @@ def get_data_user(user_id):
 
 data = get_data_user(4)
 # print(data)
-print("user_id:", data.get("user_id"))
-print("cash:", data.get("cash"))
-print("name:", data.get("name"))
+# print("user_id:", data.get("user_id"))
+# print("cash:", data.get("cash"))
+# print("name:", data.get("name"))
 
 
 
@@ -203,26 +192,15 @@ def get_data_session(user_id):
             (user_id,) 
         )
 
-        all_sesion_user = cursor.fetchall()
+        data_user = cursor.fetchall()
+
+        data = {}
+
+        for key, value in zip(cursor.description, data_user):
+            data[key[0]] = value
+
         cursor.close()
-
-
-        # # print(*user)
-
-        # # for n in user:
-        # #     ff = *(n)
-
-        # data = []
-
-        # for record in all_sesion_user:
-        #     data.append(record)
-
-
-
-
-        
-        print(data)
-        return all_sesion_user
+        return data
     
     except Exception as e:
         return f"Error get data user {e}"
@@ -230,26 +208,9 @@ def get_data_session(user_id):
 
 
 
-# data = {
-#     "user_id": 4,
-#     #"name": 'Hui',
-#     #"cash": 150400,
-#     #"session_id": 1,
-#     "tokens": 1566600,
-#     "price": 6,  
-# }
-
-
-# jopa = add_data_session(data)
-# print(jopa)
-
-
 # data = get_data_session(4)
-# # print(data)
-
-# # for n in data:
-# #     print(n)
-
-
-# user = get_data_user(4)
-# print(user.get("user_id"))
+# print("user_id:", data.get("user_id"))
+# print("cash:", data.get("cash"))
+# print("name:", data.get("name"))
+print(data.get('tokens'))
+print(data.get('price'))

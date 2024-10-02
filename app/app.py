@@ -9,23 +9,22 @@ from worker import add_data_user, get_data_user,update_data_user,add_data_sessio
 # cash = 0.0
 
 data = {
-    "user_id": 21258,
+    "user_id": 1,
     "name": 'Tommy',
     "cash": 1500,
     "tokens": 10,
     "price": 1,
-    "session_id": 1
 }
+
+
+
 user_id = data.get('user_id')
 name = data.get('name')
 cash = data.get('cash')
-session_id = data.get('session_id')
 tokens = data.get('tokens')
 price = data.get('price')
 
 
-add_data_session(data)
-print(data)
 
         
 
