@@ -1,41 +1,51 @@
-import sqlite3
+import psycopg2
+from keys import user, password
 
-# Подключение к SQLite базе данных
-conn = sqlite3.connect('./db/db.litesql')
+print(user, password)
 
-try:
-    # Создаем объект курсора
-    cursor = conn.cursor()
+connection = psycopg2.connect(host="localhost", database="my_database", user=user, password=password)
 
-    # Удаляем таблицы (если уже существуют) для избежания конфликтов
-    cursor.execute('DROP TABLE IF EXISTS session;')
-    cursor.execute('DROP TABLE IF EXISTS users;')
+def create_database():
+    try:
+        conn = connection.cursor()
 
-    # Создание таблицы users
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name VARCHAR(50),
-        cash REAL,
-        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    ''')
+        # Создание таблицы users
+        conn.execute('''
+            CREATE TABLE users (
+                user_id BIGINT PRIMARY KEY,
+                name VARCHAR(50),
+                first_name VARCHAR(50),
+                last_name VARCHAR(50),
+                created_at TIMESTAMP,
+                last_active TIMESTAMP,
+                date TIMESTAMP
+            );
+        ''')
 
-    # Создание таблицы session с исправленным синтаксисом
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS session (
-        session_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        tokens REAL,
-        price REAL,
-        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(user_id)
-    );
-    ''')
+        # Создание таблицы session
+        conn.execute('''
+            CREATE TABLE session (
+                session_id SERIAL PRIMARY KEY,
+                user_id INTEGER,
+                tokens FLOAT,
+                price FLOAT,
+                date TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(user_id)
+            );
+        ''')
 
-    # Сохраняем изменения
-    conn.commit()
+        # Сохраняем изменения
+        connection.commit()
 
-finally:
-    # Закрываем соединение
-    conn.close()
+        print("Таблицы успешно созданы.")
+    
+    except Exception as e:
+        print(f"Ошибка: {e}")
+    
+    finally:
+        # Закрываем соединение
+        conn.close()
+        connection.close()
+
+# Вызов функции для создания базы данных
+create_database()

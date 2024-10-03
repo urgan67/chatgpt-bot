@@ -1,82 +1,55 @@
 
-import sqlite3
-conn = sqlite3.connect('./db/db.litesql')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# import asyncpg
+
+# async def create_database():
+#     # Получаем данные подключения из переменных окружения
+#     user = os.getenv('USER_DB')
+#     password = os.getenv('PASWOR_DB')
+#     # host = os.getenv('DB_HOST', 'localhost')
+#     # port = os.getenv('DB_PORT', '5432')
+
+#     try:
+#         # Подключаемся к системной базе данных (например, postgres)
+#         conn = await asyncpg.connect(
+#             user=user,
+#             password=password,
+#             database='my_database',  # Системная БД для создания новых баз данных
+#             # host=host,
+#             # port=port
+#         )
+
+#         # Проверяем, существует ли уже база данных
+#         result = await conn.fetchval(
+#             "SELECT 1 FROM pg_database WHERE datname = 'my_database'"
+#         )
+        
+#         if not result:
+#             # Создаем базу данных, если она не существует
+#             await conn.execute('CREATE DATABASE my_database')
+#             print("База данных создана.")
+#         else:
+#             print("База данных уже существует.")
+        
+#     except Exception as e:
+#         print(f"Ошибка: {e}")
+    
+#     finally:
+#         # Закрываем соединение
+#         await conn.close()
+
+    # Создаем новую базу данных
+    # await conn.execute('CREATE DATABASE your_database_name')
+
+
+# Запускаем асинхронную функцию
+# asyncio.run(create_database())
+
+
+
+
+
+# import sqlite3
+# conn = sqlite3.connect('./db/db.litesql')
 
 # #### USERS:
 
