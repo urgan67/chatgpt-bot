@@ -1,93 +1,67 @@
+import asyncpg
+import asyncio
+from keys import user, password, database, host
 
-# import asyncpg
+async def connect_to_db():
+    connect = await asyncpg.connect(
+        user=user,
+        password=password,
+        host=host,
+        database=database,
+    )
+    return connect
 
-# async def create_database():
-#     # Получаем данные подключения из переменных окружения
-#     user = os.getenv('USER_DB')
-#     password = os.getenv('PASWOR_DB')
-#     # host = os.getenv('DB_HOST', 'localhost')
-#     # port = os.getenv('DB_PORT', '5432')
 
-#     try:
-#         # Подключаемся к системной базе данных (например, postgres)
-#         conn = await asyncpg.connect(
-#             user=user,
-#             password=password,
-#             database='my_database',  # Системная БД для создания новых баз данных
-#             # host=host,
-#             # port=port
-#         )
+# Добавление USERS:
 
-#         # Проверяем, существует ли уже база данных
-#         result = await conn.fetchval(
-#             "SELECT 1 FROM pg_database WHERE datname = 'my_database'"
-#         )
+async def add_data_user(data):
+    connect = None
+    try:
+        user_id = data.get("user_id")
+
+        if not user_id:
+            return False
+
+        keys, values, value = [], [], []
+
+
+
+
+
+        keys = ", ".join(data.keys())
+        # value = ", ".join(["?"] * len(data)) 
+        values = tuple(data.values())
+
+        execute = f'''
+            INSERT INTO users ({keys}) VALUES ($1, $2, $3)
+        '''
         
-#         if not result:
-#             # Создаем базу данных, если она не существует
-#             await conn.execute('CREATE DATABASE my_database')
-#             print("База данных создана.")
-#         else:
-#             print("База данных уже существует.")
-        
-#     except Exception as e:
-#         print(f"Ошибка: {e}")
-    
-#     finally:
-#         # Закрываем соединение
-#         await conn.close()
+        print(f"SQL запрос: {execute}") 
+        print(f"Значения: {values}")  
 
-    # Создаем новую базу данных
-    # await conn.execute('CREATE DATABASE your_database_name')
+        # Выполнение запроса
+        connect = await connect_to_db()
+        await connect.execute(execute, *values)
+        return True
 
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return False
+    finally:
+        if connect:
+            await connect.close()
 
-# Запускаем асинхронную функцию
-# asyncio.run(create_database())
+# Данные для добавления
+data = {
+    "user_id": 2,
+    "name": "Anton",
+    "last_name" : "ivanov"
+}
 
+    # Вызов функции для добавления пользователя
+result = asyncio.run(add_data_user(data))
+print("Данные добавлены:", result)
 
-
-
-
-# import sqlite3
-# conn = sqlite3.connect('./db/db.litesql')
-
-# #### USERS:
-
-
-# # Получение данных USERS:
-# def get_data_user(user_id):
-#     try:
-#         cursor = conn.cursor()
-#         cursor.execute('''
-#                 SELECT * FROM users WHERE user_id = ?;
-#             ''',
-#             (user_id,) 
-#         )
-
-#         data_user = cursor.fetchone()
-
-#         data = {}
-
-#         for key, value in zip(cursor.description, data_user):
-#             data[key[0]] = value
-
-#         cursor.close()
-#         return data
-    
-#     except Exception as e:
-#         return f"Error get data user {e}"
-
-
-# data = get_data_user(4)
-# # print(data)
-# # print("user_id:", data.get("user_id"))
-# # print("cash:", data.get("cash"))
-# # print("name:", data.get("name"))
-
-
-
-
-# # Добавление USERS:
 # def add_data_user(data):
 #     try:
 #         user_id = data.get("user_id")
@@ -95,44 +69,34 @@
 #         if not user_id:
 #             return False
 
-#         keys, values, drop = [], [], []
-    
-#         for key, value in data.items():
-#             keys.append(key)
-#             values.append(value)
-#             drop.append("?")
+#         keys = ", ".join(data.keys())
+#         value = ", ".join(["?"] * len(data))
+#         values = tuple(data.values())
 
-#         keys = ", ".join(keys)
-#         drop = ", ".join(drop)
+#         execute = f'''
+#             INSERT INTO users ({keys}) 
+#             VALUES ({value}) 
+#         '''
 
-#         cursor = conn.cursor()
-#         cursor.execute(
-#             f'''
-#             INSERT INTO users ({keys}) VALUES ({drop}) 
-#             ''', 
-#             (*values,) 
-#         )  # Передаем только values в execute()
-
-#         conn.commit()
-#         cursor.close()
+#         # Выполнение запроса
+#         connect = await connect_to_db()
+#         await connect.execute(execute, *values) 
 #         return True
 
 #     except Exception as e:
 #         print(f"Ошибка: {e}")
-#         return False 
+#         return False
+#     finally:
+#         if connect:
+#             await connect.close() 
 
 
-# # data = {
-# #     #"name": 'Anny',
-# #     "user_id": 10,
-# #     #"cash": 15000,
-# # }
+     
 
-# # data = add_data_user(data)
-# # print(data)
 
-# # data_2 = get_data_user(10)
-# # print(data_2)
+
+
+
 
 
 # # Обновление данных USERS:
@@ -189,6 +153,50 @@
 
 
 
+# # #### USERS:
+
+
+# # Получение данных USERS:
+
+# async def get_data_user(user_id):
+#     try:
+#         # Устанавливаем подключение к базе данных (conn должно быть асинхронным)
+#         conn = await asyncpg.connect(
+#         user=user,
+#         password=password,
+#         host=host,
+#         port=port,
+#         database=database
+#         )
+
+#         # Выполняем асинхронный запрос к базе данных
+#         query = '''
+#             SELECT * FROM users WHERE user_id = $1;
+#         '''
+#         data_user = await conn.fetchrow(query, user_id)
+
+#         # Если данные пользователя не найдены, возвращаем None
+#         if data_user is None:
+#             return None
+
+#         # Преобразуем результат запроса в словарь
+#         data = dict(data_user)
+
+#         # Закрываем подключение
+#         await conn.close()
+
+#         return data
+
+#     except Exception as e:
+#         return f"Error get data user: {e}"
+
+
+
+# # data = get_data_user(4)
+# # print(data)
+# # print("user_id:", data.get("user_id"))
+# # print("cash:", data.get("cash"))
+# # print("name:", data.get("name"))
 
 
 # #### Sessions:

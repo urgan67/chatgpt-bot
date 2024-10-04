@@ -4,8 +4,8 @@ load_dotenv()
 
 user = os.environ.get('USER_DB')
 password = os.environ.get('PASWOR_DB')
-# telegram = os.environ.get('TELE_BOT')
-# database = my_database
-
+database = os.environ.get('DB_NAME', 'my_database')
+host = os.environ.get('DB_HOST', 'localhost')  
+    
 
 

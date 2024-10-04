@@ -1,28 +1,28 @@
-from worker import add_data_user, get_data_user,update_data_user,add_data_session
+# from worker import add_data_user, get_data_user,update_data_user,add_data_session
 
 
 
-# Добавляем пользователя:
-# Сбор данных:
-# user_id = 21258098   # !
-# name = "Mark"
-# cash = 0.0
+# # Добавляем пользователя:
+# # Сбор данных:
+# # user_id = 21258098   # !
+# # name = "Mark"
+# # cash = 0.0
 
-data = {
-    "user_id": 1,
-    "name": 'Tommy',
-    "cash": 1500,
-    "tokens": 10,
-    "price": 1,
-}
+# data = {
+#     "user_id": 1,
+#     "name": 'Tommy',
+#     "cash": 1500,
+#     "tokens": 10,
+#     "price": 1,
+# }
 
 
 
-user_id = data.get('user_id')
-name = data.get('name')
-cash = data.get('cash')
-tokens = data.get('tokens')
-price = data.get('price')
+# user_id = data.get('user_id')
+# name = data.get('name')
+# cash = data.get('cash')
+# tokens = data.get('tokens')
+# price = data.get('price')
 
 
 
