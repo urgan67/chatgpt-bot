@@ -22,14 +22,9 @@ async def add_data_user(data):
         if not user_id:
             return False
 
-        keys, values, value = [], [], []
-
-
-
-
+        keys, values, = [], []
 
         keys = ", ".join(data.keys())
-        # value = ", ".join(["?"] * len(data)) 
         values = tuple(data.values())
 
         execute = f'''
