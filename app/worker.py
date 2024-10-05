@@ -11,43 +11,10 @@ async def connect_to_db():
     )
     return connect
 
+### User
+
 
 # Добавление USERS:
-
-# async def add_data_user(data):
-#     connect = None
-#     try:
-#         user_id = data.get("user_id")
-
-#         if not user_id:
-#             return False
-
-#         keys, values, = [], []
-
-#         keys = ", ".join(data.keys())
-#         values = tuple(data.values())
-
-#         execute = f'''
-#             INSERT INTO users ({keys}) VALUES ($1, $2, $3)
-#         '''
-        
-#         print(f"SQL запрос: {execute}") 
-#         print(f"Значения: {values}")  
-
-#         # Выполнение запроса
-#         connect = await connect_to_db()
-#         await connect.execute(execute, *values)
-#         return True
-
-#     except Exception as e:
-#         print(f"Ошибка: {e}")
-#         return False
-#     finally:
-#         if connect:
-#             await connect.close()
-
-
-
 async def add_data_user(data):
     connect = None
     try:
