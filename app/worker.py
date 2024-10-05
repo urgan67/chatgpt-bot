@@ -11,10 +11,9 @@ async def connect_to_db():
     )
     return connect
 
-### User
+### Users
 
-
-# Добавление USERS:
+# Добавление USER:
 async def add_data_user(data):
     connect = None
     try:
@@ -24,19 +23,14 @@ async def add_data_user(data):
             return False
 
         keys = ", ".join(data.keys())
-        values = list(data.values())  # Преобразуем значения в список
+        values = list(data.values())
 
-        # Создаем плейсхолдеры для значений ($1, $2, $3 и т.д.)
         value = ", ".join([f"${i+1}" for i in range(len(values))])
 
         execute = f'''
             INSERT INTO users ({keys}) VALUES ({value})
         '''
-        
-        # print(f"SQL запрос: {execute}") 
-        # print(f"Значения: {values}")  
 
-        # Выполнение запроса
         connect = await connect_to_db()
         await connect.execute(execute, *values)
         return True
@@ -49,95 +43,94 @@ async def add_data_user(data):
             await connect.close()
 
 
-
-
-
 # Данные для добавления
 data = {
-    "user_id": 1,
-    "name": "Timur",
-    "last_name" : "Uzbek"
+    "user_id": 3,
+    "name": "evgen",
+    "last_name" : "Urgan"
 }
 
     # Вызов функции для добавления пользователя
-result = asyncio.run(add_data_user(data))
-print("Данные добавлены:", result)
-
-# def add_data_user(data):
-#     try:
-#         user_id = data.get("user_id")
-
-#         if not user_id:
-#             return False
-
-#         keys = ", ".join(data.keys())
-#         value = ", ".join(["?"] * len(data))
-#         values = tuple(data.values())
-
-#         execute = f'''
-#             INSERT INTO users ({keys}) 
-#             VALUES ({value}) 
-#         '''
-
-#         # Выполнение запроса
-#         connect = await connect_to_db()
-#         await connect.execute(execute, *values) 
-#         return True
-
-#     except Exception as e:
-#         print(f"Ошибка: {e}")
-#         return False
-#     finally:
-#         if connect:
-#             await connect.close() 
-
-
-     
+# result = asyncio.run(add_data_user(data))
+# print("Данные добавлены:", result)
 
 
 
+# Чтение USER:
+async def get_data_user(data):
+    connect = None
+    try:
+        
+        user_id = data.get("user_id")
+        if not user_id:
+            return "User ID is missing in data"
 
+        connect = await connect_to_db()
+
+        execute = '''
+            SELECT * FROM users WHERE user_id = $1;
+        '''
+        data_user = await connect.fetchrow(execute, user_id)
+
+        if data_user is None:
+            return None
+
+        data = dict(data_user)
+        return data
+
+    except Exception as e:
+        return f"Error getting user data: {e}"
+
+    finally:
+        if connect:
+            await connect.close()
+
+# result = asyncio.run(get_data_user(data))
+# print("Данные пользователя:", result)
 
 
 
 # # Обновление данных USERS:
-# def update_data_user(data):
-#     try:
-#         user_id = data.get("user_id")
+async def update_data_user(data):
+    connect = None
+    try:
+        user_id = data.get("user_id")
 
-#         if not user_id:
-#             return False
+        if not user_id:
+            return False
 
-#         key_dict, value_dic = [], []
+        keys, values = [], []
 
-#         for key, value in data.items():
-#             if key != "user_id":
-#                 key_dict.append(f"{key} = ?")
-#                 value_dic.append(value)
+        for key, value in data.items():
+            if key != "user_id":
+                keys.append(f"{key} = ${len(values) + 1}")
+                values.append(value)
 
-#         if not key_dict:
-#             return False
+        if not keys:
+            return False
 
-#         key_dict = ", ".join(key_dict)
-#         value_dic.append(user_id)
+        key = ", ".join(keys)
+        values.append(user_id)
 
-#         cursor = conn.cursor()
-#         cursor.execute(
-#             f'''
-#                 UPDATE users SET {key_dict} WHERE user_id = ?
-#             ''',
-#                 (*value_dic,)
-#         )
+        execute = f'''
+            UPDATE users SET {key} WHERE user_id = ${len(values)}
+        '''
 
-#         conn.commit()
-#         cursor.close()
-#         return True
-    
-#     except Exception as e:
-#         print(f"An error occurred: {e}")
-#         return False
+        connect = await connect_to_db()
+        await connect.execute(execute, *values)
+        return True
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return False
+
+    finally:
+        if connect:
+            await connect.close()
 
 
+# result = asyncio.run(update_data_user(data))
+# print("Данные пользователя обновлены:", result)
 
 
 # # data = {
