@@ -133,67 +133,8 @@ async def update_data_user(data):
 # print("Данные пользователя обновлены:", result)
 
 
-# # data = {
-# #     #"name": 'Jopa',
-# #     "user_id": 8,
-# #     #"cash": 3,
-# # }
 
-# # data = update_data_user(data)
-# # print(data)
-
-# # # data_2 = get_data_user(8)
-# # # print(data_2)
-
-
-
-# # #### USERS:
-
-
-# # Получение данных USERS:
-
-# async def get_data_user(user_id):
-#     try:
-#         # Устанавливаем подключение к базе данных (conn должно быть асинхронным)
-#         conn = await asyncpg.connect(
-#         user=user,
-#         password=password,
-#         host=host,
-#         port=port,
-#         database=database
-#         )
-
-#         # Выполняем асинхронный запрос к базе данных
-#         query = '''
-#             SELECT * FROM users WHERE user_id = $1;
-#         '''
-#         data_user = await conn.fetchrow(query, user_id)
-
-#         # Если данные пользователя не найдены, возвращаем None
-#         if data_user is None:
-#             return None
-
-#         # Преобразуем результат запроса в словарь
-#         data = dict(data_user)
-
-#         # Закрываем подключение
-#         await conn.close()
-
-#         return data
-
-#     except Exception as e:
-#         return f"Error get data user: {e}"
-
-
-
-# # data = get_data_user(4)
-# # print(data)
-# # print("user_id:", data.get("user_id"))
-# # print("cash:", data.get("cash"))
-# # print("name:", data.get("name"))
-
-
-# #### Sessions:
+#### Sessions:
 
 # # Добавление Session:
 # def add_data_session(data_session):
