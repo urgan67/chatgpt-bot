@@ -46,11 +46,11 @@ async def add_data_user(data):
 
 # Данные для добавления
 # data = {
-#     "user_id": 1,
-#     "name": "iSlam",
-#     "last_name" : "Mamaev",
-#     "tokens": 10,
-#     "price": 1,
+#     "user_id": 10,
+#     "name": "qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+#     "last_name" : "qqqqqqqq",
+#     # "tokens": 100,
+#     # "price": 1,
 # }
 
 #     # Вызов функции
@@ -139,7 +139,7 @@ async def update_data_user(data):
 #### Sessions:
 
 # data_session = {
-#     "user_id": 1,
+#     "user_id": 10,
 #     "tokens": 10,
 #     "price": 1,
 #     # "session_id": 1
@@ -215,11 +215,11 @@ async def get_data_session(user_id):
 
         if connect:
             await connect.close()
-            print("Соединение с базой данных закрыто.")
+            
 
 
 # data_session = {
-#     "user_id": 1,
+#     "user_id": 2,
 #     "tokens": 10,
 #     "price": 1,
 #     # "session_id": 1
@@ -227,7 +227,11 @@ async def get_data_session(user_id):
 # tokens = data_session.get('tokens')
 # price = data_session.get('price')
 
-# result = asyncio.run(get_data_session(1))
-# print(result)
-# print(data_session.get('tokens'))
-# print(data_session.get('price'))
+result = asyncio.run(get_data_session(10))
+print(result)
+
+for dain in result:
+    print()
+    print(dain.get('tokens'))
+    print(dain.get('price'))
+
