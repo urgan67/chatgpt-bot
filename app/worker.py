@@ -13,6 +13,7 @@ async def connect_to_db():
 
 ### Users
 
+
 # Добавление USER:
 async def add_data_user(data):
     connect = None
@@ -44,16 +45,17 @@ async def add_data_user(data):
 
 
 # Данные для добавления
-data = {
-    "user_id": 3,
-    "name": "evgen",
-    "last_name" : "Urgan"
-}
+# data = {
+#     "user_id": 1,
+#     "name": "iSlam",
+#     "last_name" : "Mamaev",
+#     "tokens": 10,
+#     "price": 1,
+# }
 
-    # Вызов функции для добавления пользователя
+#     # Вызов функции
 # result = asyncio.run(add_data_user(data))
 # print("Данные добавлены:", result)
-
 
 
 # Чтение USER:
@@ -85,9 +87,9 @@ async def get_data_user(data):
         if connect:
             await connect.close()
 
+        # Вызов функции
 # result = asyncio.run(get_data_user(data))
 # print("Данные пользователя:", result)
-
 
 
 # # Обновление данных USERS:
@@ -128,7 +130,7 @@ async def update_data_user(data):
         if connect:
             await connect.close()
 
-
+        # Вызов функции
 # result = asyncio.run(update_data_user(data))
 # print("Данные пользователя обновлены:", result)
 
@@ -136,71 +138,96 @@ async def update_data_user(data):
 
 #### Sessions:
 
-# # Добавление Session:
-# def add_data_session(data_session):
-#     try:
-#         user_id = data_session.get("user_id")
-
-#         if not user_id:
-#             return False
-
-#         keys, values, drop = [], [], []
-    
-#         for key, value in data_session.items():
-#             keys.append(key)
-#             values.append(value)
-#             drop.append("?")
-
-#         keys = ", ".join(keys)
-#         drop = ", ".join(drop)
-
-#         cursor = conn.cursor()
-#         cursor.execute(
-#             f'''
-#             INSERT INTO session ({keys}) VALUES ({drop}) 
-#             ''', 
-#             (*values,) 
-#         )  # Передаем только values в execute()
-
-#         conn.commit()
-#         cursor.close()
-#         return True
-
-#     except Exception as e:
-#         print(f"Ошибка: {e}")
-#         return False 
+# data_session = {
+#     "user_id": 1,
+#     "tokens": 10,
+#     "price": 1,
+#     # "session_id": 1
+# }
 
 
+# Добавление данных в Session:
+async def add_data_session(data_session):
+    try:
 
-# # Чтение данных Session:
-# def get_data_session(user_id):
-#     try:
-#         cursor = conn.cursor()
-#         cursor.execute('''
-#                 SELECT * FROM session WHERE user_id = ?;
-#             ''',
-#             (user_id,) 
-#         )
+        user_id = data_session.get("user_id")
+        if not user_id:
+            return False
 
-#         data_user = cursor.fetchall()
-#         data_user = []
-#         data = {}
+        # Создаем списки ключей и значений
+        keys = ", ".join(data_session.keys())
+        values = list(data_session.values())
 
-#         for key, value in zip(cursor.description, data_user):
-#             data[key[0]] = value
-#         data_user.append(data)
-#         cursor.close()
-#         return data
-    
-#     except Exception as e:
-#         return f"Error get data user {e}"
-    
+        # Создаем строку плейсхолдеров вида $1, $2, ..., в зависимости от количества значений
+        value = ", ".join([f"${i+1}" for i in range(len(values))])
+
+        # SQL-запрос для вставки данных в таблицу session
+        query = f"INSERT INTO session ({keys}) VALUES ({value})"
+
+        # Подключаемся к базе данных
+        connect = await connect_to_db()
+
+        # Выполняем запрос, передавая значения
+        await connect.execute(query, *values)
+
+        return True
+
+    except Exception as e:
+        print(f"Ошибка: {e}")
+        return False
+
+    finally:
+        if connect:
+            await connect.close()
 
 
+#     # Вызов функции
+# result = asyncio.run(add_data_session(data_session))
+# print("Данные для сессии добавлены:", result)
 
-# data = get_data_session(4)
-# # print("user_id:", data.get("user_id"))
-# # print("cash:", data.get("cash"))
-# # print("name:", data.get("name"))
-# print(data.get('tokens'))
-# print(data.get('price'))
+
+#  Чтение данных Session:
+
+async def get_data_session(user_id):
+    connect = None
+    try:
+
+        execute = '''
+            SELECT * FROM session WHERE user_id = $1;
+        '''
+        connect = await connect_to_db()
+        rows = await connect.fetch(execute, user_id)  # Используем fetch для получения всех строк
+
+        if not rows:
+            return f"No session data found for user_id {user_id}"
+
+        data_user = []
+        for row in rows:
+            data = dict(row)
+            data_user.append(data)
+
+        return data_user
+
+    except Exception as e:
+        return f"Error getting session data: {e}"
+
+    finally:
+
+        if connect:
+            await connect.close()
+            print("Соединение с базой данных закрыто.")
+
+
+# data_session = {
+#     "user_id": 1,
+#     "tokens": 10,
+#     "price": 1,
+#     # "session_id": 1
+# }
+# tokens = data_session.get('tokens')
+# price = data_session.get('price')
+
+# result = asyncio.run(get_data_session(1))
+# print(result)
+# print(data_session.get('tokens'))
+# print(data_session.get('price'))
