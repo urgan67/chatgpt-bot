@@ -1,3 +1,25 @@
+# import asyncio
+# import logging
+# import sys
+# import time
+
+
+# from aiogram import Router, Bot, Dispatcher
+# from aiogram.enums import ParseMode, ChatAction
+# from aiogram.types import Message, FSInputFile
+
+# from gtts import gTTS
+# import openai
+# from keys import token, key
+
+
+# TOKEN = token
+# openai.api_key = key
+# router = Router()
+
+
+
+
 # from worker import add_data_user, get_data_user,update_data_user,add_data_session
 
 

@@ -15,7 +15,7 @@ async def connect_to_db():
 
 
 # Добавление USER:
-async def add_data_user(data):
+async def adding_user(data):
     connect = None
     try:
         user_id = data.get("user_id")
@@ -59,7 +59,7 @@ async def add_data_user(data):
 
 
 # Чтение USER:
-async def get_data_user(data):
+async def get_user_by_id(data):
     connect = None
     try:
         
@@ -93,7 +93,7 @@ async def get_data_user(data):
 
 
 # # Обновление данных USERS:
-async def update_data_user(data):
+async def update_user(data):
     connect = None
     try:
         user_id = data.get("user_id")
@@ -147,7 +147,7 @@ async def update_data_user(data):
 
 
 # Добавление данных в Session:
-async def add_data_session(data_session):
+async def add_settings(data_session):
     try:
 
         user_id = data_session.get("user_id")
@@ -188,7 +188,7 @@ async def add_data_session(data_session):
 
 #  Чтение данных Session:
 
-async def get_data_session(user_id):
+async def get_settings(user_id):
     connect = None
     try:
 
@@ -227,11 +227,11 @@ async def get_data_session(user_id):
 # tokens = data_session.get('tokens')
 # price = data_session.get('price')
 
-result = asyncio.run(get_data_session(10))
-print(result)
+# result = asyncio.run(get_settings(10))
+# print(result)
 
-for dain in result:
-    print()
-    print(dain.get('tokens'))
-    print(dain.get('price'))
+# for dain in result:
+#     print()
+#     print(dain.get('tokens'))
+#     print(dain.get('price'))
 

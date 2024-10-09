@@ -1,5 +1,35 @@
 # from worker import get_data_user,update_data_user,add_data_user,add_data_session,get_data_session
 
+
+
+    # data = {
+    #     "id": id,
+    #     "model_version": model_version,
+    #     "used_tokens": used_tokens,
+    #     "all_count": all_count,
+    #     "all_token": all_token,
+    #     "give_me_money": give_me_money,
+    #     "money": money,
+    #     "all_in_money": all_in_money,
+    # }
+
+#   temp_chat = data.temp_chat
+#     frequency = data.frequency
+#     presence = data.presence
+#     all_count = data.all_count
+#     all_token = data.all_token
+#     the_gap = data.the_gap
+#     set_model = data.set_model
+#     give_me_money = data.give_me_money
+#     money = data.money
+#     all_in_money = data.all_in_money
+#     flag_stik = data.flag_stik
+
+
+
+
+
+
 # data = {
 #     "user_id": 1,
 #     "name": "Anton",

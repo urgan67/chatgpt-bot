@@ -8,5 +8,5 @@ database = os.environ.get('DB_NAME', 'my_database')
 host = os.environ.get('DB_HOST', 'localhost')  
 token = os.environ.get('TG_TOKEN')
 key = os.environ.get('API_KEY')
-
-
+white_list = os.environ.get('WHITE_LIST')
+admin_user_ids = os.environ.get('ADMIN_USER_IDS')
