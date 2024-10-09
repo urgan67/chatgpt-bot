@@ -7,12 +7,12 @@
 #     "last_name" : "ivanov", 
 # }
 
-# # data_session = {
-# #     "user_id": 4,
-# #     "tokens": 10,
-# #     "price": 1,
-# #     # "session_id": 1
-# # }
+# data_session = {
+#     "user_id": 4,
+#     "tokens": 10,
+#     "price": 1,
+#     # "session_id": 1
+# }
 
 # user_id = data.get('user_id')
 # name = data.get('name')
