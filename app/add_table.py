@@ -3,6 +3,7 @@ from keys import user, password
 
 print(user, password)
 
+# Устанавливаем соединение с базой данных
 connection = psycopg2.connect(host="localhost", database="my_database", user=user, password=password)
 
 def create_database():
@@ -12,38 +13,66 @@ def create_database():
         # Создание таблицы users
         conn.execute('''
             CREATE TABLE users (
-                user_id BIGINT PRIMARY KEY,
-                name VARCHAR(50),
-                first_name VARCHAR(50),
-                last_name VARCHAR(50),
-                set_model VARCHAR(50),
-                all_count INTEGER DEFAULT 0,
-                all_token INTEGER DEFAULT 0,
-                is_admin BOOLEAN DEFAULT FALSE,
-                date TIMESTAMP
+                user_id BIGINT PRIMARY KEY NOT NULL,
+                username VARCHAR(100),
+                first_name VARCHAR(100) NOT NULL,
+                last_name VARCHAR(100),
+                full_name VARCHAR(100),
+                chat_id BIGINT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
         ''')
 
-# all_count — общее количество запросов, выполненных пользователем.
-# all_token — общее количество токенов, использованных пользователем.
-# set_model — текущая модель GPT, установленная пользователем.
-# money — текущий баланс пользователя в рублях.
-# timestamp — дата и время создания записи.
-
-        # Создание таблицы statistics
+        # Settings - One-to-One
         conn.execute('''
-            CREATE TABLE session (
-                user_id BIGINT PRIMARY KEY,
-                use_model VARCHAR(50),
-                sesion_token INTEGER DEFAULT 0, 
-                price_1_tok FLOAT,
-                price_session_tok FLOAT,
-                money FLOAT DEFAULT 50,
-                date TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(user_id)
+            CREATE TABLE settings (
+                id BIGINT PRIMARY KEY NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+                temp_chat FLOAT NOT NULL DEFAULT 0.7,
+                frequency FLOAT NOT NULL DEFAULT 0.5,
+                presence FLOAT NOT NULL DEFAULT 0.5,
+                flag_stik BOOLEAN NOT NULL DEFAULT FALSE,
+                all_count INTEGER NOT NULL DEFAULT 0,
+                all_token INTEGER NOT NULL DEFAULT 0,
+                the_gap FLOAT NOT NULL DEFAULT 0.05,
+                set_model VARCHAR(50) NOT NULL DEFAULT 'gpt-3.5-turbo-0613',
+                time_money TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                currency VARCHAR(50),
+                give_me_money FLOAT NOT NULL DEFAULT 0,
+                money FLOAT NOT NULL DEFAULT 100,
+                all_in_money FLOAT NOT NULL DEFAULT 0
             );
         ''')
 
+        # Saved answers and questions - One-to-One
+        conn.execute('''
+            CREATE TABLE discussion (
+                id BIGINT PRIMARY KEY NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+                discus VARCHAR(10000),
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+            );
+        ''')
+
+        # Save data exchange USD to RUB first at day - None
+        conn.execute('''
+            CREATE TABLE exchange (
+                id SERIAL PRIMARY KEY,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                rate FLOAT NOT NULL DEFAULT 100
+            );
+        ''')
+
+        # User spending statistics - One-to-many
+        conn.execute('''
+            CREATE TABLE statistics (
+                id SERIAL PRIMARY KEY,
+                time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                use_model VARCHAR(50) NOT NULL,
+                session_token INTEGER NOT NULL DEFAULT 0,
+                price_1_tok FLOAT NOT NULL DEFAULT 0,
+                price_session_tok FLOAT NOT NULL DEFAULT 0,
+                users_telegram_id BIGINT REFERENCES users(user_id) ON DELETE CASCADE
+            );
+        ''')
 
         # Сохраняем изменения
         connection.commit()
@@ -55,10 +84,10 @@ def create_database():
     
     finally:
         # Закрываем соединение
-        conn.close()
-        connection.close()
+        if conn:
+            conn.close()
+        if connection:
+            connection.close()
 
 # Вызов функции для создания базы данных
 create_database()
-
-

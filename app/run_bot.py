@@ -1,10 +1,12 @@
 import logging
-logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
-logging.basicConfig(level=logging.INFO, filename='log/app.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
+
+# logging.getLogger('aiogram').propagate = False # Блокировка логирование aiogram до его импорта
+# logging.basicConfig(level=logging.INFO, filename='log/app.log', filemode='a', format='%(levelname)s - %(asctime)s - %(name)s - %(message)s',) # При деплое активировать логирование в файл
+
 from keys import (
-    token, key, white_list, admin_user_ids,
-    block, oppas#, receiver_yoomoney, token_yoomoney, wallet_pay_token
-    )
+    token, api_key, white_list, admin_user_ids,
+    #, receiver_yoomoney, token_yoomoney, wallet_pay_token
+                   )
 # from about_bot import about_text
 # from terms_of_use import terms
 import time
@@ -12,15 +14,10 @@ import sys
 import re
 import os
 import asyncio
-import openai
-import csv
-import datetime
-
-from openai import AsyncOpenAI, RateLimitError, OpenAIError
-
-from aiogram.enums import ParseMode, ChatAction
-from aiogram.types import Message, FSInputFile
+from pathlib import Path
+from openai import OpenAIError, AsyncOpenAI, RateLimitError
 from aiogram import Bot, Dispatcher, types, F, Router
+# from aiogram.enums import ParseMode
 from aiogram.utils.markdown import hbold
 from aiogram.filters import CommandStart, Command, Filter
 from aiogram.types import (Message, BotCommand, LabeledPrice, ContentType,
@@ -30,16 +27,21 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-
+import csv
+import datetime
 from io import StringIO, BytesIO
 # from get_time import get_time
 # from calculation import calculation
 # from backupdb import backup_db
 # from restore_db import restore_db
 # from add_money import add_money_by_card, add_money_wallet_pay, add_money_cripto
-
-from gtts import gTTS
-
+#import task_backup
+#from yoomoney import Quickpay
+# from yoomoney import Client
+# from WalletPay import AsyncWalletPayAPI
+# from WalletPay import WalletPayAPI, WebhookManager
+# from WalletPay.types import Event
+# import uuid
 from worker_db import (
     adding_user, get_user_by_id, update_user, add_settings, add_discussion, update_settings,
     get_settings, get_discussion, update_discussion, get_exchange, update_exchange, get_last_30_statistics,
@@ -51,27 +53,46 @@ from worker_db import (
 #     sub_add_money, admin_menu, confirm_summ
 # )
 
+# Логирование
+logging.basicConfig(level=logging.INFO)
 
-client = openai.api_key = key
+client = AsyncOpenAI(api_key=api_key)
 dp = Dispatcher() # All handlers should be attached to the Router (or Dispatcher)
 bot = Bot(token, parse_mode="markdown") # Initialize Bot instance with a default parse mode which will be passed to all API calls
 
 
-# Флаг технических работ, избегает обращения к базе пользователями, для восстановления базы
-global work_in_progress
-work_in_progress = False
-async def worc_in_progress(goo):
-    await goo.answer("Извините, ведутся технические работы, попробуйте через 1 минуту.\nSorry, technical work is underway, try it in 1 minute.")
-    logging.info(f"Tech maintenance in progress, sorry.")
 
-# Get User_ID
+# Флаг технических работ, избегает обращения к базе пользователями, для восстановления базы
+# Глобальная переменная для флага технических работ
+work_in_progress = False
+
+async def worc_in_progress(goo):
+    global work_in_progress
+
+    if work_in_progress:
+        # Если ведутся технические работы, отправляем сообщение пользователю
+        await goo.answer("Извините, ведутся технические работы, попробуйте через 1 минуту.\nSorry, technical work is underway, try it in 1 minute.")
+        logging.info("Tech maintenance in progress, sorry.")
+    else:
+        # Если нет технических работ, выполняем нужную операцию
+        await goo.answer("Operation successful.")
+        logging.info("Operation completed successfully.")
+
+
+# Получение user_id из action
 def user_id(action) -> int:
     return action.from_user.id
 
-# Show Typing - для обращения к OpenAI другая функция которая запускается вместе с...
+# Показываем статус "печатает", отправляем действие в Telegram
 async def typing(action) -> None:
-    await bot.send_chat_action(action.chat.id, action='typing')
-    # await asyncio.sleep(5)
+    try:
+        # Отправка статуса "печатает" в чат
+        await bot.send_chat_action(action.chat.id, action='typing')
+        # Вы можете добавить задержку, если хотите
+        # await asyncio.sleep(5)
+    except Exception as e:
+        logging.error(f"Failed to send typing action: {e}")
+
 
 
 # PUSH /START
@@ -79,7 +100,7 @@ async def typing(action) -> None:
 async def command_start_handler(message: Message) -> None:
     await typing(message)
 
-    if work_in_progress == True:
+    if work_in_progress:
         await worc_in_progress(message)
         return
 
@@ -91,27 +112,83 @@ async def command_start_handler(message: Message) -> None:
     ]
     await bot.set_my_commands(bot_commands)
 
-   ###### Get All data user on telegram ######
+    ###### Get All data user on telegram ######
     id = user_id(message)
     name = message.from_user.username
     full_name = message.from_user.full_name
     first_name = message.from_user.first_name
     last_name = message.from_user.last_name
+    chat_id = message.chat.id
     is_admin = False
-    admin_id = admin_user_ids[1:-1]
-    ###### Get All data user on telegram ######
-
+    admin_user_ids = [admin_user_ids]  # Пример admin_user_ids
+ 
+    # Логируем
     logging.info(f"User {id} press /start")
 
-    # Checking and added the parameters
-    if str(id) in admin_user_ids:
-        is_admin = True
-        logging.info(f"The user id:{id} is assigned as an admin.")
-   
     # Preparing data for the user
-    user_data = {"id": id, "name": name, "full_name": full_name, "first_name":first_name,\
-                    "last_name": last_name,"is_admin": is_admin,
-                }
+    user_data = {
+        "id": id, 
+        "name": name, 
+        "full_name": full_name, 
+        "first_name": first_name,
+        "last_name": last_name, 
+        "chat_id": chat_id, 
+        "is_admin": is_admin
+    }
+
+    # Если пользователь уже существует в базе, обновляем данные, иначе добавляем нового
+    try:
+        is_on_user = await get_user_by_id(id)
+        if is_on_user is not None:
+            await update_user(id, user_data)  # Обновление данных пользователя
+        else:
+            await adding_user(user_data)  # Добавление нового пользователя
+            await add_settings(id)  # Добавление настроек
+            await add_discussion(id)  # Добавление обсуждений
+    except Exception as e:
+        logging.error(f"Error during user database operations: {e}")
+
+    # Choosing a name user
+    about = name if name else (first_name if first_name else (last_name if last_name else "bro"))
+
+    # Checking and adding the parameters in Settings to white list users and gives them money
+    if str(id) in white_list:
+        money = 1000  # Yep!
+        updated_data = {"money": money}
+    
+        # Обновляем деньги для пользователя в базе данных
+        confirmation = await update_settings(id, updated_data)  # Gives money
+        if confirmation:
+            logging.info(f"1000 RUB added, user id is: {id}.")
+        else:
+            logging.error(f"1000 RUB has not been added, user id is: {id}.")
+
+# Send greeting message
+    await message.answer(
+        f"Привет {about}! Я *ChatGPT*. Мне можно сразу задать вопрос или настроить - /setup. Там же можно выбрать последнюю модель ChatGPT.\n"
+        f"Hello {about}! I am *ChatGPT*. You can ask me a question right away or set up - /setup. You can also select the latest ChatGPT model there."
+            )
+        
+
+async def main_bot() -> None:
+    #backup_task = asyncio.create_task(backup_loop())
+    await dp.start_polling(bot, skip_updates=False) # skip_updates=False обрабатывать каждое сообщение с серверов Telegram, важно для принятия платежей
+
+
+
+# Start and Restart
+if __name__ == "__main__":
+    # retries = 5
+    # while retries > 0:
+    try:
+        asyncio.run(main_bot())
+        #break # Если выполнение успешно - выходим из цикла.
+    except Exception as e:
+        logging.error(f"An error occurred: {e}. Restarting after a delay...")
+        # retries -= 1
+        
+        # if retries > 0:
+        #     time.sleep(5)  # Ожидаем перед попыткой перезапуска
 
 
     ###### Get All data user on telegram ######
