@@ -20,7 +20,7 @@ def create_database():
                 full_name VARCHAR(100),
                 all_count INTEGER,
                 all_token INTEGER,
-                set_model VARCHAR(50) DEFAULT 'gpt-3.5-turbo',
+                set_model VARCHAR(50),
                 currency VARCHAR(50),
                 give_me_money FLOAT,
                 money FLOAT,

@@ -157,7 +157,12 @@ async def ask_gpt(message: types.Message):
             new_money = money - all_token
             new_data = {"user_id": id, "money": new_money}
 
-            await update_user(id, new_data)
+            await update_user(new_data)
+            await bot.send_message(
+                    message.chat.id, 
+                    f"Потрачено {total_tokens} токенов. С вашего счета списано {all_token:.2f} руб. Остаток: {new_money:.2f} руб."
+                )
+
             return
         else:
             await message.answer("При обработке вашего запроса возникла ошибка.")
