@@ -104,7 +104,7 @@ async def ask_gpt(message: types.Message):
         else:
             response = await question_openai(text, model)
             if response:
-                await message.answer(response, markdown = 'markdown')
+                await message.answer(response.get("gpt_response"), markdown = 'markdown')
                 return
 
 
