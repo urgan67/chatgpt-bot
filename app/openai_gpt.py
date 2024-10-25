@@ -8,7 +8,6 @@ default_model = "gpt-3.5-turbo"
 
 # @dp.message(F.content_type.in_({'text'}))
 async def question_openai(text, model):
-    total_tokens = 0
     if not model:
         model = default_model
     try:

@@ -80,34 +80,60 @@ async def ask_gpt(message: types.Message):
     await typing(message)
 
     id = user_id(message)
+    flag = False
     model = None
-    total_tokens = None
     text = message.text
 
     user_data = {
         "user_id": id,
-        "all_token" : total_tokens,
+        "money" : money,
     }
 
     data = await get_user_by_id(user_data)
 
+    
+
     if str(id) in white_list:
+        flag = True
         
-        response = await question_openai(text, model)
-        if response:
-            await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
-            return
-        else:
-            await message.answer("При обработке вашего запроса возникла ошибка.")
-            return
+    money = data["money"]
+
+    if id in money <=0 and flag == False:
+        await bot.send_message(message.chat.id, "Извините, на счете не достаточно средств")
+        return
+    
+    response = await question_openai(text, model)
+    if response:
+        await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
+        return
     else:
-        if data['money'] < 0:
-            await bot.send_message(message.chat.id, "Извините, на счете не достаточно средств")
-        else:
-            response = await question_openai(text, model)
-            if response:
-                await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
-                return
+        await message.answer("При обработке вашего запроса возникла ошибка.")
+        return
+    
+    if flag ==True:
+        return
+    else:
+        pass
+   
+        
+
+    # if str(id) in white_list:
+        
+    #     response = await question_openai(text, model)
+    #     if response:
+    #         await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
+    #         return
+    #     else:
+    #         await message.answer("При обработке вашего запроса возникла ошибка.")
+    #         return
+    # else:
+    #     if data['money'] < 0:
+    #         await bot.send_message(message.chat.id, "Извините, на счете не достаточно средств")
+    #     else:
+    #         response = await question_openai(text, model)
+    #         if response:
+    #             await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
+    #             return
 
 
 
