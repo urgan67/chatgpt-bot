@@ -81,10 +81,12 @@ async def ask_gpt(message: types.Message):
 
     id = user_id(message)
     model = None
+    total_tokens = None
     text = message.text
 
     user_data = {
         "user_id": id,
+        "all_token" : total_tokens,
     }
 
     data = await get_user_by_id(user_data)
