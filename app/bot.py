@@ -93,7 +93,7 @@ async def ask_gpt(message: types.Message):
         
         response = await question_openai(text, model)
         if response:
-            await message.answer(response.get("gpt_response"), markdown = 'markdown')
+            await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
             return
         else:
             await message.answer("При обработке вашего запроса возникла ошибка.")
@@ -104,7 +104,7 @@ async def ask_gpt(message: types.Message):
         else:
             response = await question_openai(text, model)
             if response:
-                await message.answer(response.get("gpt_response"), markdown = 'markdown')
+                await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
                 return
 
 
