@@ -167,44 +167,6 @@ async def ask_gpt(message: types.Message):
         print(f"Произошла ошибка: {err}")
         return
 
-            
-    #         return
-    #     else:
-    #         await message.answer("При обработке вашего запроса возникла ошибка.")
-    #         return
-    # except Exception as e:
-    #     err = str(e)
-    #     print(f"Произошла ошибка: {err}")
-    #     return
-    
-    # data = {}
-
-
-    
-    # if flag ==True:
-    #     return
-    # used_token = total_token["total_token"]
-    # all_token = used_token * 1_token
-   
-        
-
-    # if str(id) in white_list:
-        
-    #     response = await question_openai(text, model)
-    #     if response:
-    #         await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
-    #         return
-    #     else:
-    #         await message.answer("При обработке вашего запроса возникла ошибка.")
-    #         return
-    # else:
-    #     if data['money'] < 0:
-    #         await bot.send_message(message.chat.id, "Извините, на счете не достаточно средств")
-    #     else:
-    #         response = await question_openai(text, model)
-    #         if response:
-    #             await message.answer(response.get("gpt_response", 'total_tokens'), markdown = 'markdown')
-    #             return
 
 
 
