@@ -17,11 +17,10 @@ async def question_openai(text, model):
         )
 
         gpt_response = response.choices[0].message.content.strip()
+        total_tokens = response['usage']['total_tokens']
         
     except Exception as e:
         print(f"Ошибка: {str(e)}") 
     
-    return gpt_response
-
-    # return {"gpt_response": gpt_response, "used_tokens": used_tokens}
-
+    # return gpt_response
+    return {"gpt_response": gpt_response, "total_tokens": total_tokens}
