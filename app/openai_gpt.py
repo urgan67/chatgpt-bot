@@ -4,10 +4,6 @@ from keys import api_key
 
 client = AsyncOpenAI(api_key=api_key)
 
-default_model = 'gpt-4o-mini-2024-07-18'
-
-
-
 # @dp.message(F.content_type.in_({'text'}))
 async def question_openai(text, model):
     try:
