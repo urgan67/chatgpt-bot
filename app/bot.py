@@ -82,41 +82,42 @@ async def ask_gpt(message: types.Message):
 
     id = user_id(message)
     flag = False
-    model = 'gpt-4o-mini-2024-07-18'
+    
     text = message.text
    
 
     data = await get_user_by_id(id) 
 
-    money = data.get("money")
+    
 
     if str(id) in white_list:
         flag = True
 
+    money = data.get("money")
     if money <=0 and flag == False:
         await bot.send_message(message.chat.id, "Извините, на счете не достаточно средств")
         return
     
+    model = 'gpt-4o-mini-2024-07-18'
     response = await question_openai(text, model)
-    if response:
-        await message.answer(response.get("gpt_response"), markdown = 'markdown')
-        if flag == True:
+    await message.answer(response.get("gpt_response"), markdown = 'markdown')
+    if flag == True:
+        return
+    else:
+        total_tokens = response.get("total_tokens")
+        tok_1_rub = price.get(model) / 1000
+        total_coast = total_tokens * tok_1_rub
+
+        new_money = money - total_coast
+        new_data = {"user_id": id, "money": new_money}
+
+        confirm = await update_user(new_data)
+        if confirm:
+            # await bot.send_message(message.chat.id, "Баланс обновлен")
             return
         else:
-            total_tokens = response.get("total_tokens")
-            tok_1_rub = price.get(model) / 1000
-            total_coast = total_tokens * tok_1_rub
-
-            new_money = money - total_coast
-            new_data = {"user_id": id, "money": new_money}
-
-            confirm = await update_user(new_data)
-            if confirm:
-                # await bot.send_message(message.chat.id, "Баланс обновлен")
-                return
-    else:
-        await message.answer("При обработке вашего запроса возникла ошибка.")
-        return
+            await message.answer("При обработке вашего запроса возникла ошибка.")
+            return
           
 
 async def main():
