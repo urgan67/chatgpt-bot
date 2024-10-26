@@ -13,10 +13,9 @@ async def connect_to_db():
 #### USER TELEGRAM PROPERTY #### 
 
 # Получение данных пользователя по user_id
-async def get_user_by_id(data):
+async def get_user_by_id(user_id):
     connect = None
     try:
-        user_id = data.get("user_id")
         if not user_id:
             return None  # Если user_id не передан, возвращаем None
 
