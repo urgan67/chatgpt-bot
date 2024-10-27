@@ -3,14 +3,15 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, BotCommand
 
+
 from keys import token, white_list
 from worker_db import adding_user, get_user_by_id, update_user
 from openai_gpt import question_openai
 from text_model_openai import price
 
+
 bot = Bot(token=token)
 dp = Dispatcher()
-
 
 # Получить ID пользователя
 def user_id(action) -> int:
@@ -72,53 +73,49 @@ async def command_start_handler(message: Message) -> None:
         if confirm_add:
             await bot.send_message(message.chat.id, f"Привет {hello}! Я *ChatGPT*. Задайте вопрос или настройте - /setup.")
      
-        
-
 
 
 @dp.message(F.content_type.in_({'text'}))
-async def ask_gpt(message: types.Message):
+async def text_message(message: types.Message):
     await typing(message)
+
+    text = message.text
 
     id = user_id(message)
     flag = False
-    
-    text = message.text
-   
-
-    data = await get_user_by_id(id) 
-
-    
+    data = await get_user_by_id(id)
 
     if str(id) in white_list:
         flag = True
 
     money = data.get("money")
-    if money <=0 and flag == False:
+    if money <= 0 and not flag:
         await bot.send_message(message.chat.id, "Извините, на счете не достаточно средств")
         return
     
     model = 'gpt-4o-mini-2024-07-18'
-    response = await question_openai(text, model)
-    await message.answer(response.get("gpt_response"), markdown = 'markdown')
-    if flag == True:
-        return
-    else:
+    response = await question_openai(text, model)  # Используем текст, который может быть транскрипцией
+
+    if response:  # Проверяем, был ли ответ
+        await message.answer(response.get("gpt_response"), parse_mode='Markdown')
+
+    if not flag: 
         total_tokens = response.get("total_tokens")
         tok_1_rub = price.get(model) / 1000
-        total_coast = total_tokens * tok_1_rub
+        total_cost = total_tokens * tok_1_rub
 
-        new_money = money - total_coast
+        new_money = money - total_cost
         new_data = {"user_id": id, "money": new_money}
 
         confirm = await update_user(new_data)
-        if confirm:
-            # await bot.send_message(message.chat.id, "Баланс обновлен")
-            return
-        else:
+        if not confirm:
             await message.answer("При обработке вашего запроса возникла ошибка.")
-            return
           
+
+
+
+
+
 
 async def main():
     await dp.start_polling(bot)
