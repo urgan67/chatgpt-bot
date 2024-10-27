@@ -1,12 +1,15 @@
 import asyncio
+import os
+
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.types import Message, BotCommand
-
+from pathlib import Path
 
 from keys import token, white_list
 from worker_db import adding_user, get_user_by_id, update_user
 from openai_gpt import question_openai
+from stt import stt
 from text_model_openai import price
 
 
@@ -75,20 +78,47 @@ async def command_start_handler(message: Message) -> None:
      
 
 
-@dp.message(F.content_type.in_({'text'}))
-async def text_message(message: types.Message):
+
+VOICE_FOLDER = Path("voice_message")    # Определяем папку для хранения голосовых сообщений
+VOICE_FOLDER.mkdir(exist_ok=True)  # Создаем папку, если ее нет
+
+@dp.message(F.content_type == 'voice')
+async def voice_message_handler(message: types.Message):
     await typing(message)
 
-    text = message.text
+    # Скачиваем голосовое сообщение
+    voice = message.voice
+    file_info = await bot.get_file(voice.file_id)
+    voice_file = VOICE_FOLDER / f"{voice.file_id}.ogg"
+
+    # Сохраняем файл в папку voice_message
+    await bot.download_file(file_info.file_path, destination=voice_file)
+    
+    # Транскрибируем аудиофайл
+    text = await stt(voice_file)
+    if text:
+        # Передаем транскрибированный текст в text_message как аргумент
+        await text_message(message, text=text)
+    else:
+        await bot.send_message(message.chat.id, "Не удалось распознать сообщение.")
+
+
+@dp.message(F.content_type.in_({'text'}))
+async def text_message(message: types.Message, text: str = None):
+    await typing(message)
+
+    # Используем переданный текст или, если это текстовое сообщение, message.text
+    text = text or message.text
+    if not text:  # Проверка на пустой текст
+        await bot.send_message(message.chat.id, "Сообщение не содержит текста.")
+        return
 
     id = user_id(message)
-    flag = False
     data = await get_user_by_id(id)
 
-    if str(id) in white_list:
-        flag = True
+    flag = str(id) in white_list
+    money = data.get("money", 0)
 
-    money = data.get("money")
     if money <= 0 and not flag:
         await bot.send_message(message.chat.id, "Извините, на счете не достаточно средств")
         return
@@ -96,22 +126,24 @@ async def text_message(message: types.Message):
     model = 'gpt-4o-mini-2024-07-18'
     response = await question_openai(text, model)  # Используем текст, который может быть транскрипцией
 
-    if response:  # Проверяем, был ли ответ
-        await message.answer(response.get("gpt_response"), parse_mode='Markdown')
+    if response:  # Проверяем, был ли ответ от OpenAI
+        gpt_response = response.get("gpt_response")
+        if gpt_response:
+            await message.answer(gpt_response, parse_mode='Markdown')
+        else:
+            await message.answer("Не удалось получить ответ от модели.")
 
-    if not flag: 
-        total_tokens = response.get("total_tokens")
-        tok_1_rub = price.get(model) / 1000
-        total_cost = total_tokens * tok_1_rub
+        if not flag: 
+            total_tokens = response.get("total_tokens", 0)
+            tok_1_rub = price.get(model) / 1000
+            total_cost = total_tokens * tok_1_rub
 
-        new_money = money - total_cost
-        new_data = {"user_id": id, "money": new_money}
+            new_money = money - total_cost
+            new_data = {"user_id": id, "money": new_money}
 
-        confirm = await update_user(new_data)
-        if not confirm:
-            await message.answer("При обработке вашего запроса возникла ошибка.")
-          
-
+            confirm = await update_user(new_data)
+            if not confirm:
+                await message.answer("При обработке вашего запроса возникла ошибка.")
 
 
 
